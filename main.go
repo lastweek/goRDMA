@@ -17,5 +17,9 @@ import (
 func main() {
 	fmt.Println("Hello from Golang!")
 	C.test_print()
-	C.goRDMA_detect_devices()
+	C.goRDMA_get_device_list()
+
+	ib_dev := C.goRDMA_get_ibv_device(C.CString("mlx5_0"))
+	fmt.Println(ib_dev)
+	C.ibv_open_device(ib_dev)
 }

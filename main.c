@@ -50,6 +50,33 @@ int ibdev2netdev(const char *ibdev, char *ndev, size_t ndev_buf_size)
 	return ret;
 }
 
+struct ibv_device *goRDMA_get_ibv_device(char *name)
+{
+	struct ibv_device **dev_list;
+	int i, num_devices;
+	struct ibv_device *ib_dev;
+	int ret;
+
+	dev_list = ibv_get_device_list(&num_devices);
+	if (!dev_list) {
+		perror("Failed to get devices list");
+		return NULL;
+	}
+
+	for (i = 0; i < num_devices; i++) {
+		ib_dev = dev_list[i];
+		if (!ib_dev) {
+			fprintf(stderr, "IB device [%d] not valid\n", i);
+			return NULL;
+		}
+
+		if (!strncmp(ibv_get_device_name(ib_dev), name, 32)) {
+			return ib_dev;
+		}
+	}
+	return NULL;
+}
+
 /*
  * Dump all IBV devices and their corresponding network device name.
  * This function calls the original ibv_get_device_list().
